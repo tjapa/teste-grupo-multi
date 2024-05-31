@@ -2,10 +2,14 @@
   "name": "teste-grupo-multi",
   "version": "1.0.0",
   "scripts": {
+    "start": "node dist/src/main/server.js",
     "build": "tsc -p tsconfig.json",
     "build:watch": "tsc -w",
+    "dev": "npm run build && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"npm:build:watch\" \"npm:dev:start\"",
+    "dev:start": "node --watch-path=./dist dist/src/main/server.js",
     "db:generate-migrations": "drizzle-kit generate",
     "db:migrate": "ts-node --skipProject drizzle/migrate.ts",
+    "db:seed": "ts-node --skipProject drizzle/seed.ts",
     "prepare": "husky",
     "test": "jest --passWithNoTests --runInBand --no-cache --silent",
     "test:unit": "npm test -- --watch -c jest-unit.config.ts",
@@ -14,9 +18,10 @@
     "test:ci": "npm test -- --coverage"
   },
   "devDependencies": {
+    "@elysiajs/eden": "^1.0.14",
     "@eslint/js": "^9.3.0",
+    "@faker-js/faker": "^8.4.1",
     "@types/jest": "^29.5.12",
-    "@types/supertest": "^6.0.2",
     "concurrently": "^8.2.2",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
@@ -24,16 +29,24 @@
     "jest": "^29.7.0",
     "lint-staged": "^15.2.5",
     "prettier": "^3.2.5",
-    "supertest": "^7.0.0",
     "ts-jest": "^29.1.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5",
     "typescript-eslint": "^7.11.0"
   },
   "dependencies": {
+    "@bogeychan/elysia-polyfills": "^0.6.4",
+    "@elysiajs/swagger": "^1.0.5",
+    "axios": "^1.7.2",
     "dotenv": "^16.4.5",
     "drizzle-kit": "^0.21.4",
     "drizzle-orm": "^0.30.10",
+    "elysia": "^1.0.22",
+    "module-alias": "^2.2.3",
     "postgres": "^3.4.4"
+  },
+  "_moduleAliases": {
+    "@/tests": "dist/tests",
+    "@": "dist/src"
   }
 }
