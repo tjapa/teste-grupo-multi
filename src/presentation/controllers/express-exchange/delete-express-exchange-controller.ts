@@ -1,7 +1,13 @@
 import { DeleteExpressExchangeUseCase } from '@/domain/use-cases/express-exchange/delete-express-exchange-use-case'
 import { Controller, HttpRequest, HttpResponse } from '@/presentation/protocols'
 import { ItemNotFoundError } from '@/domain/errors/item-not-found-error'
-import { notFound, ok, serverError } from '@/presentation/helpers/http-helpers'
+import {
+  notFound,
+  ok,
+  serverError,
+  unprocessableContent,
+} from '@/presentation/helpers/http-helpers'
+import { ExpressExchangeCantBeDeletedError } from '@/domain/errors/express-exchange-cant-be-deleted-error'
 
 export type HttpRequestT = {
   body: {
@@ -29,6 +35,8 @@ export class DeleteExpressExchangeController
     } catch (error) {
       if (error instanceof ItemNotFoundError) {
         return notFound(error)
+      } else if (error instanceof ExpressExchangeCantBeDeletedError) {
+        return unprocessableContent(error)
       }
       console.error(error)
       return serverError()
