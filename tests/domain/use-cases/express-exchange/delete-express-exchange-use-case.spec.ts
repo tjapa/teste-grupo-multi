@@ -4,7 +4,6 @@ import {
 } from '@/domain/use-cases/express-exchange/delete-express-exchange-use-case'
 import { mockExpressExchange } from '../../mocks/mock-express-exchange'
 import { ItemNotFoundError } from '@/domain/errors/item-not-found-error'
-import { Customer } from '@/domain/models/customer'
 import { ExpressExchange } from '@/domain/models/express-exchange'
 import { GetExpressExchangeByIdRepositoryStub } from '@/tests/repository/mocks/mock-get-express-exchange-by-id-repository'
 import { DeleteExpressExchangeByIdRepositoryStub } from '@/tests/repository/mocks/mock-delete-express-exchange-by-id-repository'
