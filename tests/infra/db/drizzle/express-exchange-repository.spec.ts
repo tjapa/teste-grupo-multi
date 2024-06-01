@@ -36,7 +36,7 @@ describe('Express Exchange Repository', () => {
   }
 
   describe('getByInvoiceId()', () => {
-    test('Should return an invoice with product ids on create success', async () => {
+    test('Should return an express exchange success', async () => {
       const sut = makeSut()
 
       const customer = mockCustomer()
@@ -80,6 +80,59 @@ describe('Express Exchange Repository', () => {
       const sut = makeSut()
 
       const invoiceReturned = await sut.getByInvoiceId(
+        'any_invalid_id',
+        faker.string.uuid(),
+      )
+
+      expect(invoiceReturned).toBeUndefined()
+    })
+  })
+
+  describe('getById()', () => {
+    test('Should return an express exchange on success', async () => {
+      const sut = makeSut()
+
+      const customer = mockCustomer()
+      const product1 = mockProductExpressExchangeAvailable()
+      const product2 = mockProductExpressExchangeUnavailable()
+      const invoice = mockInvoice()
+      invoice.customerId = customer.id
+      const expressExchange = mockExpressExchange()
+      expressExchange.customerId = customer.id
+      expressExchange.invoiceId = invoice.id
+      expressExchange.productId = product1.id
+      await drizzleClient.insert(customers).values(customer)
+      await drizzleClient.insert(products).values([product1, product2])
+      await drizzleClient.insert(invoices).values(invoice)
+      await drizzleClient.insert(invoiceProducts).values([
+        { invoiceId: invoice.id, productId: product1.id },
+        { invoiceId: invoice.id, productId: product2.id },
+      ])
+      await drizzleClient.insert(expressExchanges).values(expressExchange)
+
+      const expressExchangeReturned = await sut.getById(
+        expressExchange.id,
+        customer.id,
+      )
+
+      expect(expressExchangeReturned).toEqual(expressExchange)
+    })
+
+    test('Should return an undefined if express exchange not found', async () => {
+      const sut = makeSut()
+
+      const invoiceReturned = await sut.getById(
+        faker.string.uuid(),
+        faker.string.uuid(),
+      )
+
+      expect(invoiceReturned).toBeUndefined()
+    })
+
+    test('Should return an undefined if is called with invalid uuid', async () => {
+      const sut = makeSut()
+
+      const invoiceReturned = await sut.getById(
         'any_invalid_id',
         faker.string.uuid(),
       )
