@@ -6,7 +6,7 @@ import {
   CreateExpressExchange,
   CreateExpressExchangeParams,
   CreateExpressExchangeUseCase,
-} from '@/domain/use-cases/express-exchange/create-express-exchange'
+} from '@/domain/use-cases/express-exchange/create-express-exchange-use-case'
 import { GetInvoiceByIdWithProductIdsRepositoryStub } from '@/tests/repository/mocks/mock-get-invoice-by-id-repository'
 import { GetProductByIdRepositoryStub } from '@/tests/repository/mocks/mock-get-product-by-id-repository'
 import { GetCustomerAddressByIdRepositoryStub } from '@/tests/repository/mocks/mock-get-customer-address-by-id-repository'

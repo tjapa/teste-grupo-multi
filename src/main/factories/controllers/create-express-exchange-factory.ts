@@ -1,4 +1,4 @@
-import { CreateExpressExchange } from '@/domain/use-cases/express-exchange/create-express-exchange'
+import { CreateExpressExchange } from '@/domain/use-cases/express-exchange/create-express-exchange-use-case'
 import { CustomerRepository } from '@/infra/db/drizzle/customer-repository'
 import { ExpressExchangeRepository } from '@/infra/db/drizzle/express-exchange-repository'
 import { InvoiceRepository } from '@/infra/db/drizzle/invoice-repository'

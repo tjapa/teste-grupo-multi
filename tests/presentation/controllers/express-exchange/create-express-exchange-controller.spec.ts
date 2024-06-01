@@ -1,4 +1,4 @@
-import { CreateExpressExchangeUseCase } from '@/domain/use-cases/express-exchange/create-express-exchange'
+import { CreateExpressExchangeUseCase } from '@/domain/use-cases/express-exchange/create-express-exchange-use-case'
 import {
   CreateExpressExchangeController,
   HttpRequestBody,

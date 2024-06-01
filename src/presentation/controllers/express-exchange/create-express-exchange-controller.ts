@@ -1,4 +1,4 @@
-import { CreateExpressExchangeUseCase } from '@/domain/use-cases/express-exchange/create-express-exchange'
+import { CreateExpressExchangeUseCase } from '@/domain/use-cases/express-exchange/create-express-exchange-use-case'
 import { Controller, HttpRequest, HttpResponse } from '@/presentation/protocols'
 import { ExpressExchangeForInvoiceAlreadyExistsError } from '@/domain/errors/express-exchange-for-invoice-already-exists-error'
 import { ExpressExchangeProductUnavailableError } from '@/domain/errors/express-exchange-product-unavailable'
