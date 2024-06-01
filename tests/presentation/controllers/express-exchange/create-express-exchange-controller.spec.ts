@@ -14,6 +14,7 @@ import { InvoiceWarrantyExpiredError } from '@/domain/errors/invoice-warranty-ex
 import { ExpressExchangeForInvoiceAlreadyExistsError } from '@/domain/errors/express-exchange-for-invoice-already-exists-error'
 import { InvoiceDoesNotContainTheProductError } from '@/domain/errors/invoice-does-not-contain-the-product-error'
 import { ExpressExchangeProductUnavailableError } from '@/domain/errors/express-exchange-product-unavailable'
+import { ItemNotFoundError } from '@/domain/errors/item-not-found-error'
 
 type SutType = {
   sut: CreateExpressExchangeController
@@ -80,6 +81,15 @@ describe('Create Express Exchange Controller', () => {
       const response = await sut.handle(httpRequest)
       expect(response.statusCode).toEqual(422)
     }
+  })
+
+  test('Should return not found if createExpressExchangeUseCase returns a ItemNotFoundError', async () => {
+    const { sut, createExpressExchangeUseCase, httpRequest } = makeSut()
+    jest
+      .spyOn(createExpressExchangeUseCase, 'create')
+      .mockRejectedValue(new ItemNotFoundError('any', 'any'))
+    const response = await sut.handle(httpRequest)
+    expect(response.statusCode).toEqual(404)
   })
 
   test('Should return server error for unexpected error on createExpressExchangeUseCase', async () => {
