@@ -13,23 +13,22 @@ import {
   unprocessableContent,
 } from '@/presentation/helpers/http-helpers'
 
-export type HttpRequestBody = {
-  customerId: string
-  invoiceId: string
-  productId: string
-  customerAddressId: string
+export type HttpRequestT = {
+  body: {
+    customerId: string
+    invoiceId: string
+    productId: string
+    customerAddressId: string
+  }
 }
 
 export class CreateExpressExchangeController
-  implements Controller<HttpRequestBody, any, any>
-{
+  implements Controller<HttpRequestT> {
   constructor(
     private readonly createExpressExchange: CreateExpressExchangeUseCase,
-  ) {}
+  ) { }
 
-  async handle(
-    httpRequest: HttpRequest<HttpRequestBody>,
-  ): Promise<HttpResponse> {
+  async handle(httpRequest: HttpRequest<HttpRequestT>): Promise<HttpResponse> {
     try {
       const { body } = httpRequest
       const expressExchangeCreated =

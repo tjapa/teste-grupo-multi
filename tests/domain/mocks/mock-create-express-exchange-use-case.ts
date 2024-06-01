@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker'
 import {
   CreateExpressExchangeParams,
   CreateExpressExchangeUseCase,
-} from '../use-cases/express-exchange/create-express-exchange-use-case'
+} from '@/domain/use-cases/express-exchange/create-express-exchange-use-case'
 import { mockExpressExchange } from './mock-express-exchange'
 import { ExpressExchange } from '@/domain/models/express-exchange'
 

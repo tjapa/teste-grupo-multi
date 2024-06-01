@@ -3,8 +3,4 @@ export type HttpResponse<B = unknown> = {
   body: B
 }
 
-export type HttpRequest<B = unknown, Q = unknown, P = unknown> = {
-  body: B
-  query: Q
-  params: P
-}
+export type HttpRequest<T = {}> = {} & T

@@ -1,7 +1,7 @@
 import { CreateExpressExchangeUseCase } from '@/domain/use-cases/express-exchange/create-express-exchange-use-case'
 import {
   CreateExpressExchangeController,
-  HttpRequestBody,
+  HttpRequestT,
 } from '@/presentation/controllers/express-exchange/create-express-exchange-controller'
 import { CreateExpressExchangeStub } from '@/tests/domain/mocks/mock-create-express-exchange-use-case'
 import { HttpRequest } from '@/presentation/protocols'
@@ -19,7 +19,7 @@ type SutType = {
   sut: CreateExpressExchangeController
   createExpressExchangeUseCase: CreateExpressExchangeUseCase
   expressExchange: ExpressExchange
-  httpRequest: HttpRequest<HttpRequestBody>
+  httpRequest: HttpRequest<HttpRequestT>
 }
 
 const makeSut = (): SutType => {
@@ -31,15 +31,13 @@ const makeSut = (): SutType => {
   jest
     .spyOn(createExpressExchangeUseCase, 'create')
     .mockResolvedValue(expressExchange)
-  const httpRequest: HttpRequest<HttpRequestBody> = {
+  const httpRequest: HttpRequest<HttpRequestT> = {
     body: {
       customerId: expressExchange.customerId,
       invoiceId: expressExchange.invoiceId,
       productId: expressExchange.productId,
       customerAddressId: faker.string.uuid(),
     },
-    query: undefined,
-    params: undefined,
   }
 
   return {

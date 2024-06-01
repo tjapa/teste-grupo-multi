@@ -5,7 +5,7 @@ export function adaptElysiaHttpRequest<B = any, Q = any, P = any>(context: {
   query: Q
   params: P
 }) {
-  const httpRequest: HttpRequest<B, Q, P> = {
+  const httpRequest: HttpRequest<{ body: B; query: Q; params: P }> = {
     body: context.body,
     query: context.query,
     params: context.params,
