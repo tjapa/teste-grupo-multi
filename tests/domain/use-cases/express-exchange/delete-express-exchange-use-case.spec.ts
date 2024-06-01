@@ -83,7 +83,7 @@ describe('Delete Express Exchange Use Case', () => {
     expect(promise).rejects.toThrow(ItemNotFoundError)
   })
 
-  test('Should throw if getExpressExchangeByIdRepository returns undefined', async () => {
+  test('Should throw if express exchange has status different than "processing"', async () => {
     const { sut, expressExchange, getExpressExchangeByIdRepository } = makeSut()
 
     expressExchange.status = 'sent'

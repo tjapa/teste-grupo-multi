@@ -9,6 +9,7 @@ import { mockExpressExchange } from '@/tests/domain/mocks/mock-express-exchange'
 import { ExpressExchange } from '@/domain/models/express-exchange'
 import { ok } from '@/presentation/helpers/http-helpers'
 import { ItemNotFoundError } from '@/domain/errors/item-not-found-error'
+import { ExpressExchangeCantBeDeletedError } from '@/domain/errors/express-exchange-cant-be-deleted-error'
 
 type SutType = {
   sut: DeleteExpressExchangeController
@@ -67,6 +68,18 @@ describe('Delete Express Exchange Controller', () => {
       .mockRejectedValue(new ItemNotFoundError('Express Exchange', 'any_id'))
     const response = await sut.handle(httpRequest)
     expect(response.statusCode).toEqual(404)
+  })
+
+  test('Should return unprocessable content if deleteExpressExchangeUseCase returns', async () => {
+    const { sut, deleteExpressExchangeUseCase, httpRequest } = makeSut()
+
+    jest
+      .spyOn(deleteExpressExchangeUseCase, 'delete')
+      .mockRejectedValue(
+        new ExpressExchangeCantBeDeletedError('any_id', 'any_status'),
+      )
+    const response = await sut.handle(httpRequest)
+    expect(response.statusCode).toEqual(422)
   })
 
   test('Should return server error for unexpected error on deleteExpressExchangeUseCase', async () => {
