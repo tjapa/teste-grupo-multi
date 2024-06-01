@@ -9,12 +9,14 @@ import { GetExpressExchangeByInvoiceIdRepository } from '@/repository/express-ex
 import { and, eq } from 'drizzle-orm'
 import { HandleInvalidUuidError } from './decorators/handle-invalid-uuid-error'
 import { GetExpressExchangeByIdRepository } from '@/repository/express-exchange/get-express-exchange-by-id-repository'
+import { DeleteExpressExchangeByIdRepository } from '@/repository/express-exchange/delete-express-exchange-by-id-repository'
 
 export class ExpressExchangeRepository
   implements
   CreateExpressExchangeRepository,
   GetExpressExchangeByIdRepository,
-  GetExpressExchangeByInvoiceIdRepository {
+  GetExpressExchangeByInvoiceIdRepository,
+  DeleteExpressExchangeByIdRepository {
   @HandleInvalidUuidError
   async create(
     expressExchangeData: CreateExpressExchangeData,
@@ -51,5 +53,23 @@ export class ExpressExchangeRepository
         eq(expressExchanges.customerId, customerId),
       ),
     })
+  }
+
+  @HandleInvalidUuidError
+  async deleteById(
+    expressExchangeId: string,
+    customerId: string,
+  ): Promise<ExpressExchange | undefined> {
+    return (
+      await drizzleClient
+        .delete(expressExchanges)
+        .where(
+          and(
+            eq(expressExchanges.id, expressExchangeId),
+            eq(expressExchanges.customerId, customerId),
+          ),
+        )
+        .returning()
+    )[0]
   }
 }

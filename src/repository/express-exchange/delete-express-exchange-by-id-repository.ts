@@ -4,5 +4,5 @@ export interface DeleteExpressExchangeByIdRepository {
   deleteById: (
     expressExchange: string,
     customerId: string,
-  ) => Promise<ExpressExchange>
+  ) => Promise<ExpressExchange | undefined>
 }
