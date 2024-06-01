@@ -30,7 +30,7 @@ const makeSut = (): SutType => {
   const expressExchange = mockExpressExchange()
   jest
     .spyOn(createExpressExchangeUseCase, 'create')
-    .mockReturnValue(Promise.resolve(expressExchange))
+    .mockResolvedValue(expressExchange)
   const httpRequest: HttpRequest<HttpRequestBody> = {
     body: {
       customerId: expressExchange.customerId,

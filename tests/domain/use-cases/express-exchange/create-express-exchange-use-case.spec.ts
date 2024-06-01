@@ -102,13 +102,11 @@ const makeSut = (): SutType => {
   }
   jest
     .spyOn(getInvoiceByIdWithProductIdsRepository, 'getByIdWithProductIds')
-    .mockReturnValue(Promise.resolve(invoiceWithProductIds))
-  jest
-    .spyOn(getProductByIdRepository, 'getById')
-    .mockReturnValue(Promise.resolve(product))
+    .mockResolvedValue(invoiceWithProductIds)
+  jest.spyOn(getProductByIdRepository, 'getById').mockResolvedValue(product)
   jest
     .spyOn(createExpressExchangeRepository, 'create')
-    .mockReturnValue(Promise.resolve(expressExchange))
+    .mockResolvedValue(expressExchange)
 
   return {
     sut,
@@ -173,7 +171,7 @@ describe('Create Express Exchange Use Case', () => {
     } = makeSut()
     jest
       .spyOn(getInvoiceByIdWithProductIdsRepository, 'getByIdWithProductIds')
-      .mockReturnValueOnce(Promise.resolve(undefined))
+      .mockResolvedValueOnce(undefined)
     const promise = sut.create(createExpressExchangeParams)
 
     expect(promise).rejects.toThrow(ItemNotFoundError)
@@ -187,7 +185,7 @@ describe('Create Express Exchange Use Case', () => {
     } = makeSut()
     jest
       .spyOn(getInvoiceByIdWithProductIdsRepository, 'getByIdWithProductIds')
-      .mockReturnValueOnce(Promise.resolve(mockInvoiceWithProductIds()))
+      .mockResolvedValueOnce(mockInvoiceWithProductIds())
     const promise = sut.create(createExpressExchangeParams)
 
     expect(promise).rejects.toThrow(InvoiceDoesNotContainTheProductError)
@@ -213,7 +211,7 @@ describe('Create Express Exchange Use Case', () => {
     const { sut, createExpressExchangeParams, checkInvoiceWarranty } = makeSut()
     jest
       .spyOn(checkInvoiceWarranty, 'check')
-      .mockReturnValueOnce(Promise.resolve(mockInvoiceWarrantyCheckFalse()))
+      .mockResolvedValueOnce(mockInvoiceWarrantyCheckFalse())
     const promise = sut.create(createExpressExchangeParams)
 
     expect(promise).rejects.toThrow(InvoiceWarrantyExpiredError)
@@ -235,7 +233,7 @@ describe('Create Express Exchange Use Case', () => {
       makeSut()
     jest
       .spyOn(getProductByIdRepository, 'getById')
-      .mockReturnValueOnce(Promise.resolve(undefined))
+      .mockResolvedValueOnce(undefined)
     const promise = sut.create(createExpressExchangeParams)
 
     expect(promise).rejects.toThrow(ItemNotFoundError)
@@ -262,7 +260,7 @@ describe('Create Express Exchange Use Case', () => {
       makeSut()
     jest
       .spyOn(getProductStockIntegration, 'getProductStock')
-      .mockReturnValueOnce(Promise.resolve({ stock: 0 }))
+      .mockResolvedValueOnce({ stock: 0 })
     const promise = sut.create(createExpressExchangeParams)
 
     expect(promise).rejects.toThrow(ProductOutOfStockError)
@@ -294,7 +292,7 @@ describe('Create Express Exchange Use Case', () => {
     } = makeSut()
     jest
       .spyOn(getExpressExchangeByInvoiceIdRepository, 'getByInvoiceId')
-      .mockReturnValueOnce(Promise.resolve(mockExpressExchange()))
+      .mockResolvedValueOnce(mockExpressExchange())
     const promise = sut.create(createExpressExchangeParams)
 
     expect(promise).rejects.toThrow(ExpressExchangeForInvoiceAlreadyExistsError)
@@ -326,7 +324,7 @@ describe('Create Express Exchange Use Case', () => {
     } = makeSut()
     jest
       .spyOn(getCustomerAddressByIdRepository, 'getCustomerAddressById')
-      .mockReturnValueOnce(Promise.resolve(undefined))
+      .mockResolvedValueOnce(undefined)
     const promise = sut.create(createExpressExchangeParams)
 
     expect(promise).rejects.toThrow(ItemNotFoundError)
