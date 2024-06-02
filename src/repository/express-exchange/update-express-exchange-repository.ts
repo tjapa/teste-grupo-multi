@@ -12,5 +12,7 @@ export type UpdateExpressExchangeData = {
 export interface UpdateExpressExchangeRepository {
   update: (
     expressExchangeData: UpdateExpressExchangeData,
+    expressExchangeId: string,
+    customerId: string,
   ) => Promise<ExpressExchange>
 }

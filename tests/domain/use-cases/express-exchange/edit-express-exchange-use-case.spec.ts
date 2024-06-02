@@ -15,7 +15,10 @@ import { GetInvoiceByIdWithProductIdsRepository } from '@/repository/invoice/get
 import { GetProductByIdRepository } from '@/repository/product/get-product-by-id-repository'
 import { GetCustomerAddressByIdRepository } from '@/repository/customer/get-customer-address-by-id-repository'
 import { GetProductStockIntegration } from '@/integration/product/get-product-stock-integration'
-import { UpdateExpressExchangeRepository } from '@/repository/express-exchange/update-express-exchange-repository'
+import {
+  UpdateExpressExchangeData,
+  UpdateExpressExchangeRepository,
+} from '@/repository/express-exchange/update-express-exchange-repository'
 import { CheckInvoiceWarrantyIntegration } from '@/integration/invoice/check-invoice-warranty-integration'
 import { UpdateExpressExchangeRepositoryStub } from '@/tests/repository/mocks/mock-update-express-exchange-repository'
 import {
@@ -50,6 +53,7 @@ type SutType = {
   currentExpressExchange: ExpressExchange
   updatedCustomerAddress: CustomerAddress
   updatedProduct: Product
+  updatedExpressExchange: ExpressExchange
   invoiceWithProductIds: InvoiceWithProductIds
   editExpressExchangeParams: EditExpressExchangeParams
   getInvoiceByIdWithProductIdsRepository: GetInvoiceByIdWithProductIdsRepository
@@ -131,6 +135,9 @@ const makeSut = (): SutType => {
     .spyOn(getProductByIdRepository, 'getById')
     .mockResolvedValue(updatedProduct)
   jest
+    .spyOn(getCustomerAddressByIdRepository, 'getCustomerAddressById')
+    .mockResolvedValue(updatedCustomerAddress)
+  jest
     .spyOn(updateExpressExchangeRepository, 'update')
     .mockResolvedValue(updatedExpressExchange)
 
@@ -138,6 +145,7 @@ const makeSut = (): SutType => {
     sut,
     editExpressExchangeParams,
     currentExpressExchange,
+    updatedExpressExchange,
     updatedCustomerAddress,
     updatedProduct,
     invoiceWithProductIds,
@@ -380,5 +388,34 @@ describe('Edit Express Exchange Use Case', () => {
     const promise = sut.edit(editExpressExchangeParams)
 
     expect(promise).rejects.toThrow(ItemNotFoundError)
+  })
+
+  test('Should call updateExpressExchangeRepository with correct params', async () => {
+    const {
+      sut,
+      editExpressExchangeParams,
+      updateExpressExchangeRepository,
+      updatedProduct,
+      updatedCustomerAddress,
+    } = makeSut()
+    const updateSpy = jest.spyOn(updateExpressExchangeRepository, 'update')
+
+    const editExpressExchangeData: UpdateExpressExchangeData = {
+      productId: updatedProduct.id,
+      streetAddress: updatedCustomerAddress.streetAddress,
+      streetAddressLine2: updatedCustomerAddress.streetAddressLine2,
+      houseNumber: updatedCustomerAddress.houseNumber,
+      district: updatedCustomerAddress.district,
+      city: updatedCustomerAddress.city,
+      state: updatedCustomerAddress.state,
+    }
+
+    await sut.edit(editExpressExchangeParams)
+
+    expect(updateSpy).toHaveBeenCalledWith(
+      editExpressExchangeData,
+      editExpressExchangeParams.expressExchangeId,
+      editExpressExchangeParams.customerId,
+    )
   })
 })

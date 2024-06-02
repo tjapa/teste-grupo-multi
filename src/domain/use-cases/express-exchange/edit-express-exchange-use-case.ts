@@ -130,7 +130,11 @@ export class EditExpressExchange implements EditExpressExchangeUseCase {
     }
 
     const expressExchangeEdited =
-      await this.updateExpressExchangeRepository.update(expressExchangeEditData)
+      await this.updateExpressExchangeRepository.update(
+        expressExchangeEditData,
+        expressExchangeId,
+        customerId,
+      )
 
     return expressExchangeEdited
   }

@@ -10,6 +10,8 @@ export class UpdateExpressExchangeRepositoryStub
 {
   async update(
     expressExchangeData: UpdateExpressExchangeData,
+    expressExchangeId: string,
+    customerId: string,
   ): Promise<ExpressExchange> {
     return mockExpressExchange()
   }
