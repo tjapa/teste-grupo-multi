@@ -24,7 +24,10 @@ import {
   CheckInvoiceWarrantyIntegrationStub,
   mockInvoiceWarrantyCheckFalse,
 } from '@/tests/integration/mocks/mock-check-invoice-warranty-integration'
-import { mockProductExpressExchangeAvailable } from '../../mocks/mock-product'
+import {
+  mockProductExpressExchangeAvailable,
+  mockProductExpressExchangeUnavailable,
+} from '../../mocks/mock-product'
 import {
   mockInvoice,
   mockInvoiceWithProductIds,
@@ -38,6 +41,7 @@ import { InvoiceWithProductIds } from '@/domain/models/invoice'
 import { Product } from '@/domain/models/product'
 import { ProductOutOfStockError } from '@/domain/errors/product-out-of-stock-error'
 import { ExpressExchangeForInvoiceAlreadyExistsError } from '@/domain/errors/express-exchange-for-invoice-already-exists-error'
+import { ExpressExchangeProductUnavailableError } from '@/domain/errors/express-exchange-product-unavailable'
 
 type SutType = {
   sut: CreateExpressExchangeUseCase
@@ -239,7 +243,18 @@ describe('Create Express Exchange Use Case', () => {
     expect(promise).rejects.toThrow(ItemNotFoundError)
   })
 
-  test('Should call getProductById with correct params', async () => {
+  test('Should throw if product doesnt have express exchange available', async () => {
+    const { sut, createExpressExchangeParams, getProductByIdRepository } =
+      makeSut()
+    jest
+      .spyOn(getProductByIdRepository, 'getById')
+      .mockResolvedValueOnce(mockProductExpressExchangeUnavailable())
+    const promise = sut.create(createExpressExchangeParams)
+
+    expect(promise).rejects.toThrow(ExpressExchangeProductUnavailableError)
+  })
+
+  test('Should call getProductStockIntegration with correct params', async () => {
     const {
       sut,
       createExpressExchangeParams,
@@ -316,7 +331,7 @@ describe('Create Express Exchange Use Case', () => {
     )
   })
 
-  test('Should if customer address not found', async () => {
+  test('Should throw if customer address not found', async () => {
     const {
       sut,
       createExpressExchangeParams,
