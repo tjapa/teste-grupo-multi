@@ -4,10 +4,8 @@ import { ItemNotFoundError } from '@/domain/errors/item-not-found-error'
 import { notFound, ok, serverError } from '@/presentation/helpers/http-helpers'
 
 export type HttpRequestT = {
-  body: {
-    customerId: string
-  }
   params: {
+    customerId: string
     expressExchangeId: string
   }
 }
@@ -17,10 +15,10 @@ export class GetExpressExchangeController implements Controller<HttpRequestT> {
 
   async handle(httpRequest: HttpRequest<HttpRequestT>): Promise<HttpResponse> {
     try {
-      const { body, params } = httpRequest
+      const { params } = httpRequest
       const expressExchangeGetd = await this.getExpressExchange.get(
         params.expressExchangeId,
-        body.customerId,
+        params.customerId,
       )
       return ok(expressExchangeGetd)
     } catch (error) {

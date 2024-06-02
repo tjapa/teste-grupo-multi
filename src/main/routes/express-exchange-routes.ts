@@ -29,6 +29,22 @@ export const expressExchangeRoutes = new Elysia({
       }),
     },
   )
+  .get(
+    '/:expressExchangeId',
+    async (context) => {
+      const httpRequest = adaptElysiaHttpRequest(context)
+      const httpResponse =
+        await deleteExpressExchangeController.handle(httpRequest)
+      context.set.status = httpResponse.statusCode
+      return httpResponse.body
+    },
+    {
+      params: t.Object({
+        customerId: t.String(),
+        expressExchangeId: t.String(),
+      }),
+    },
+  )
   .delete(
     '/:expressExchangeId',
     async (context) => {
