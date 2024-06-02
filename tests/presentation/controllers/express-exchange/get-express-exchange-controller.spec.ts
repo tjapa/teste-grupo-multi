@@ -27,10 +27,11 @@ const makeSut = (): SutType => {
     .spyOn(getExpressExchangeUseCase, 'get')
     .mockResolvedValue(expressExchange)
   const httpRequest: HttpRequest<HttpRequestT> = {
-    body: {
+    params: {
+      expressExchangeId: expressExchange.id,
+
       customerId: expressExchange.customerId,
     },
-    params: { expressExchangeId: expressExchange.id },
   }
 
   return {
@@ -55,7 +56,7 @@ describe('Get Express Exchange Controller', () => {
 
     expect(getSpy).toHaveBeenCalledWith(
       httpRequest.params.expressExchangeId,
-      httpRequest.body.customerId,
+      httpRequest.params.customerId,
     )
   })
 

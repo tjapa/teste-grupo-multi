@@ -116,7 +116,67 @@ describe('Receiver Routes', () => {
     })
   })
 
-  describe('DELETE /express-exchanges/:expressExchangeId', () => {
+  describe('GET /customers/:customerId/express-exchanges/:expressExchangeId', () => {
+    // setup for success flow
+    const customer = mockCustomer()
+    const customerAddress = mockCustomerAddress()
+    customerAddress.customerId = customer.id
+    const product1 = mockProductExpressExchangeAvailable()
+    const product2 = mockProductExpressExchangeUnavailable()
+    const invoice = mockInvoice()
+    invoice.customerId = customer.id
+    let expressExchange = mockExpressExchange()
+    expressExchange = {
+      ...expressExchange,
+      ...customerAddress,
+      customerId: customer.id,
+      invoiceId: invoice.id,
+      productId: product1.id,
+    }
+
+    beforeEach(async () => {
+      await drizzleClient.delete(expressExchanges)
+      await drizzleClient.delete(invoiceProducts)
+      await drizzleClient.delete(invoices)
+      await drizzleClient.delete(products)
+      await drizzleClient.delete(customerAddresses)
+      await drizzleClient.delete(customers)
+
+      // setup for success flow
+      await drizzleClient.insert(customers).values(customer)
+      await drizzleClient.insert(customerAddresses).values(customerAddress)
+      await drizzleClient.insert(products).values([product1, product2])
+      await drizzleClient.insert(invoices).values(invoice)
+      await drizzleClient.insert(invoiceProducts).values([
+        { invoiceId: invoice.id, productId: product1.id },
+        { invoiceId: invoice.id, productId: product2.id },
+      ])
+      await drizzleClient.insert(expressExchanges).values(expressExchange)
+    })
+
+    test('Should return 200 and an express exchange on success', async () => {
+      const response =
+        await apiClient.api.customers[customer.id]['express-exchanges'][
+          expressExchange.id
+        ].get()
+
+      const { createdAt, updatedAt, ...expressExchangeWithoutDates } =
+        expressExchange
+
+      expect(response.status).toEqual(200)
+      expect(response.data).toMatchObject(expressExchangeWithoutDates)
+    })
+
+    test('Should return 404 if express exchange not found', async () => {
+      const response =
+        await apiClient.api.customers[customer.id]['express-exchanges'][
+          faker.string.uuid()
+        ].get()
+      expect(response.status).toEqual(404)
+    })
+  })
+
+  describe('DELETE /customers/:customerId/express-exchanges/:expressExchangeId', () => {
     // setup for success flow
     const customer = mockCustomer()
     const customerAddress = mockCustomerAddress()
