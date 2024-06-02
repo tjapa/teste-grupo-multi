@@ -35,7 +35,7 @@ describe('Receiver Routes', () => {
     await app.stop()
   })
 
-  describe('POST /express-exchanges', () => {
+  describe('POST /customers/:customerId/express-exchanges', () => {
     // setup for success flow
     const customer = mockCustomer()
     const customerAddress = mockCustomerAddress()
@@ -65,8 +65,9 @@ describe('Receiver Routes', () => {
     })
 
     test('Should return 201 and an express exchange on success and if express exchange already exists for invoice should return 422', async () => {
-      const response = await apiClient.api['express-exchanges'].post({
-        customerId: customer.id,
+      const response = await apiClient.api.customers[customer.id][
+        'express-exchanges'
+      ].post({
         customerAddressId: customerAddress.id,
         invoiceId: invoice.id,
         productId: product1.id,
@@ -78,8 +79,9 @@ describe('Receiver Routes', () => {
         expressExchangeCreated!
       expect(response.data).toMatchObject(expressExchangeCreatedWithoutDates)
 
-      const response2 = await apiClient.api['express-exchanges'].post({
-        customerId: customer.id,
+      const response2 = await apiClient.api.customers[customer.id][
+        'express-exchanges'
+      ].post({
         customerAddressId: customerAddress.id,
         invoiceId: invoice.id,
         productId: product1.id,
@@ -91,13 +93,11 @@ describe('Receiver Routes', () => {
       const invalidRequests = [
         {
           // missing field
-          customerAddressId: customerAddress.id,
           invoiceId: invoice.id,
           productId: product1.id,
         },
         {
           // wrong type
-          customerId: customer.id,
           customerAddressId: customerAddress.id,
           invoiceId: 312312,
           productId: product1.id,
@@ -105,9 +105,12 @@ describe('Receiver Routes', () => {
       ]
 
       for (const invalidRequest of invalidRequests) {
-        const response =
+        const response = await apiClient.api.customers[customer.id][
+          'express-exchanges'
+        ].post(
           // @ts-ignore
-          await apiClient.api['express-exchanges'].post(invalidRequest)
+          invalidRequest,
+        )
         expect(response.status).toEqual(422)
       }
     })
@@ -152,11 +155,10 @@ describe('Receiver Routes', () => {
     })
 
     test('Should return 200 and an express exchange on success', async () => {
-      const response = await apiClient.api['express-exchanges'][
-        expressExchange.id
-      ].delete({
-        customerId: customer.id,
-      })
+      const response =
+        await apiClient.api.customers[customer.id]['express-exchanges'][
+          expressExchange.id
+        ].delete()
 
       const { createdAt, updatedAt, ...expressExchangeWithoutDates } =
         expressExchange
@@ -174,40 +176,19 @@ describe('Receiver Routes', () => {
         .update(expressExchanges)
         .set({ status: 'sent' })
         .where(eq(expressExchanges.id, expressExchange.id))
-      const response = await apiClient.api['express-exchanges'][
-        expressExchange.id
-      ].delete({
-        customerId: customer.id,
-      })
+      const response =
+        await apiClient.api.customers[customer.id]['express-exchanges'][
+          expressExchange.id
+        ].delete()
       expect(response.status).toEqual(422)
     })
 
     test('Should return 404 if express exchange not found', async () => {
-      const response = await apiClient.api['express-exchanges'][
-        faker.string.uuid()
-      ].delete({
-        customerId: customer.id,
-      })
+      const response =
+        await apiClient.api.customers[customer.id]['express-exchanges'][
+          faker.string.uuid()
+        ].delete()
       expect(response.status).toEqual(404)
-    })
-
-    test('Should return 422 on invalid request data', async () => {
-      const invalidRequests = [
-        {
-          // missing field
-        },
-        {
-          // wrong type
-          customerId: 12312321,
-        },
-      ]
-
-      for (const invalidRequest of invalidRequests) {
-        const response =
-          // @ts-ignore
-          await apiClient.api['express-exchanges'].post(invalidRequest)
-        expect(response.status).toEqual(422)
-      }
     })
   })
 })

@@ -34,10 +34,12 @@ const makeSut = (): SutType => {
     .mockResolvedValue(expressExchange)
   const httpRequest: HttpRequest<HttpRequestT> = {
     body: {
-      customerId: expressExchange.customerId,
       invoiceId: expressExchange.invoiceId,
       productId: expressExchange.productId,
       customerAddressId: faker.string.uuid(),
+    },
+    params: {
+      customerId: expressExchange.customerId,
     },
   }
 
@@ -61,7 +63,10 @@ describe('Create Express Exchange Controller', () => {
     const createSpy = jest.spyOn(createExpressExchangeUseCase, 'create')
     await sut.handle(httpRequest)
 
-    expect(createSpy).toHaveBeenCalledWith(httpRequest.body)
+    expect(createSpy).toHaveBeenCalledWith({
+      ...httpRequest.body,
+      ...httpRequest.params,
+    })
   })
 
   test('Should return unprocessable entity for some errors on createExpressExchangeUseCase', async () => {

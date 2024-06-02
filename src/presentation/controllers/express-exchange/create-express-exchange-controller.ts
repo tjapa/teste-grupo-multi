@@ -15,10 +15,12 @@ import {
 
 export type HttpRequestT = {
   body: {
-    customerId: string
     invoiceId: string
     productId: string
     customerAddressId: string
+  }
+  params: {
+    customerId: string
   }
 }
 
@@ -30,9 +32,13 @@ export class CreateExpressExchangeController
 
   async handle(httpRequest: HttpRequest<HttpRequestT>): Promise<HttpResponse> {
     try {
-      const { body } = httpRequest
-      const expressExchangeCreated =
-        await this.createExpressExchange.create(body)
+      const { body, params } = httpRequest
+      const expressExchangeCreated = await this.createExpressExchange.create({
+        invoiceId: body.invoiceId,
+        productId: body.productId,
+        customerAddressId: body.customerAddressId,
+        customerId: params.customerId,
+      })
       return created(expressExchangeCreated)
     } catch (error) {
       if (error instanceof ItemNotFoundError) {

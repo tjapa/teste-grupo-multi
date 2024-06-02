@@ -10,10 +10,8 @@ import {
 import { ExpressExchangeCantBeDeletedError } from '@/domain/errors/express-exchange-cant-be-deleted-error'
 
 export type HttpRequestT = {
-  body: {
-    customerId: string
-  }
   params: {
+    customerId: string
     expressExchangeId: string
   }
 }
@@ -26,10 +24,10 @@ export class DeleteExpressExchangeController
 
   async handle(httpRequest: HttpRequest<HttpRequestT>): Promise<HttpResponse> {
     try {
-      const { body, params } = httpRequest
+      const { params } = httpRequest
       const expressExchangeDeleted = await this.deleteExpressExchange.delete(
         params.expressExchangeId,
-        body.customerId,
+        params.customerId,
       )
       return ok(expressExchangeDeleted)
     } catch (error) {

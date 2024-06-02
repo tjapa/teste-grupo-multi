@@ -28,10 +28,10 @@ const makeSut = (): SutType => {
     .spyOn(deleteExpressExchangeUseCase, 'delete')
     .mockResolvedValue(expressExchange)
   const httpRequest: HttpRequest<HttpRequestT> = {
-    body: {
+    params: {
+      expressExchangeId: expressExchange.id,
       customerId: expressExchange.customerId,
     },
-    params: { expressExchangeId: expressExchange.id },
   }
 
   return {
@@ -56,7 +56,7 @@ describe('Delete Express Exchange Controller', () => {
 
     expect(deleteSpy).toHaveBeenCalledWith(
       httpRequest.params.expressExchangeId,
-      httpRequest.body.customerId,
+      httpRequest.params.customerId,
     )
   })
 
