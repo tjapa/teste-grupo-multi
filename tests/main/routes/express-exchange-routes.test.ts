@@ -251,4 +251,101 @@ describe('Receiver Routes', () => {
       expect(response.status).toEqual(404)
     })
   })
+
+  describe('PATCH /customers/:customerId/express-exchanges/:expressExchangeId', () => {
+    // setup for success flow
+    const customer = mockCustomer()
+    const currentCustomerAddress = mockCustomerAddress()
+    currentCustomerAddress.customerId = customer.id
+    const updatedCustomerAddress = mockCustomerAddress()
+    updatedCustomerAddress.customerId = customer.id
+    const currentProduct = mockProductExpressExchangeAvailable()
+    const updatedProduct = mockProductExpressExchangeAvailable()
+    const invoice = mockInvoice()
+    invoice.customerId = customer.id
+    let expressExchange = mockExpressExchange()
+    expressExchange = {
+      ...expressExchange,
+      ...currentCustomerAddress,
+      customerId: customer.id,
+      invoiceId: invoice.id,
+      productId: currentProduct.id,
+    }
+
+    beforeEach(async () => {
+      await drizzleClient.delete(expressExchanges)
+      await drizzleClient.delete(invoiceProducts)
+      await drizzleClient.delete(invoices)
+      await drizzleClient.delete(products)
+      await drizzleClient.delete(customerAddresses)
+      await drizzleClient.delete(customers)
+
+      // setup for success flow
+      await drizzleClient.insert(customers).values(customer)
+      await drizzleClient
+        .insert(customerAddresses)
+        .values([currentCustomerAddress, updatedCustomerAddress])
+      await drizzleClient
+        .insert(products)
+        .values([currentProduct, updatedProduct])
+      await drizzleClient.insert(invoices).values(invoice)
+      await drizzleClient.insert(invoiceProducts).values([
+        { invoiceId: invoice.id, productId: currentProduct.id },
+        { invoiceId: invoice.id, productId: updatedProduct.id },
+      ])
+      await drizzleClient.insert(expressExchanges).values(expressExchange)
+    })
+
+    test('Should return 200 and an express exchange on success', async () => {
+      const response = await apiClient.api.customers[customer.id][
+        'express-exchanges'
+      ][expressExchange.id].patch({
+        productId: updatedProduct.id,
+        customerAddressId: updatedCustomerAddress.id,
+      })
+
+      const expressExchangeUpdateData = {
+        productId: updatedProduct.id,
+        streetAddress: updatedCustomerAddress.streetAddress,
+        streetAddressLine2: updatedCustomerAddress.streetAddressLine2,
+        houseNumber: updatedCustomerAddress.houseNumber,
+        district: updatedCustomerAddress.district,
+        city: updatedCustomerAddress.city,
+        state: updatedCustomerAddress.state,
+      }
+
+      expect(response.status).toEqual(200)
+      expect(response.data).toMatchObject(expressExchangeUpdateData)
+
+      const expressExchangeShouldBeUpdated =
+        await drizzleClient.query.expressExchanges.findFirst()
+      expect(expressExchangeShouldBeUpdated).toMatchObject(
+        expressExchangeUpdateData,
+      )
+    })
+
+    test('Should return 422 if express exchange cant be edited because status is different from "processing"', async () => {
+      await drizzleClient
+        .update(expressExchanges)
+        .set({ status: 'sent' })
+        .where(eq(expressExchanges.id, expressExchange.id))
+      const response = await apiClient.api.customers[customer.id][
+        'express-exchanges'
+      ][expressExchange.id].patch({
+        productId: updatedProduct.id,
+        customerAddressId: updatedCustomerAddress.id,
+      })
+      expect(response.status).toEqual(422)
+    })
+
+    test('Should return 404 if express exchange not found', async () => {
+      const response = await apiClient.api.customers[customer.id][
+        'express-exchanges'
+      ][faker.string.uuid()].patch({
+        productId: updatedProduct.id,
+        customerAddressId: updatedCustomerAddress.id,
+      })
+      expect(response.status).toEqual(404)
+    })
+  })
 })
