@@ -7,7 +7,10 @@ import {
   invoices,
   products,
 } from '@/infra/db/drizzle/schemas'
-import { mockCustomer } from '@/tests/domain/mocks/mock-customer'
+import {
+  mockCustomer,
+  mockCustomerAddress,
+} from '@/tests/domain/mocks/mock-customer'
 import {
   mockProductExpressExchangeAvailable,
   mockProductExpressExchangeUnavailable,
@@ -16,6 +19,7 @@ import { mockInvoice } from '@/tests/domain/mocks/mock-invoice'
 import { faker } from '@faker-js/faker'
 import { ExpressExchangeRepository } from '@/infra/db/drizzle/express-exchange-repository'
 import { mockExpressExchange } from '@/tests/domain/mocks/mock-express-exchange'
+import { UpdateExpressExchangeData } from '@/repository/express-exchange/update-express-exchange-repository'
 
 describe('Express Exchange Repository', () => {
   afterAll(async () => {
@@ -187,6 +191,65 @@ describe('Express Exchange Repository', () => {
 
       const expressExchangeReturned = await sut.deleteById(
         'any_invalid_id',
+        faker.string.uuid(),
+      )
+
+      expect(expressExchangeReturned).toBeUndefined()
+    })
+  })
+
+  describe('update()', () => {
+    test('Should return an express exchange updated on success', async () => {
+      const sut = makeSut()
+
+      const customer = mockCustomer()
+      const currentProduct = mockProductExpressExchangeAvailable()
+      const updatedProduct = mockProductExpressExchangeAvailable()
+      const invoice = mockInvoice()
+      invoice.customerId = customer.id
+      const expressExchange = mockExpressExchange()
+      expressExchange.customerId = customer.id
+      expressExchange.invoiceId = invoice.id
+      expressExchange.productId = currentProduct.id
+      await drizzleClient.insert(customers).values(customer)
+      await drizzleClient
+        .insert(products)
+        .values([currentProduct, updatedProduct])
+      await drizzleClient.insert(invoices).values(invoice)
+      await drizzleClient.insert(invoiceProducts).values([
+        { invoiceId: invoice.id, productId: currentProduct.id },
+        { invoiceId: invoice.id, productId: updatedProduct.id },
+      ])
+      await drizzleClient.insert(expressExchanges).values(expressExchange)
+
+      const updateCustomerAddress = mockCustomerAddress()
+      const expressExchangeUpdateData: UpdateExpressExchangeData = {
+        productId: updatedProduct.id,
+        streetAddress: updateCustomerAddress.streetAddress,
+        streetAddressLine2: updateCustomerAddress.streetAddressLine2,
+        houseNumber: updateCustomerAddress.houseNumber,
+        district: updateCustomerAddress.district,
+        city: updateCustomerAddress.city,
+        state: updateCustomerAddress.state,
+      }
+
+      const expressExchangeReturned = await sut.update(
+        expressExchangeUpdateData,
+        expressExchange.id,
+        customer.id,
+      )
+
+      expect(expressExchangeReturned).toMatchObject(expressExchangeUpdateData)
+      expect(expressExchangeReturned.updatedAt.getTime()).toBeGreaterThan(
+        expressExchange.updatedAt.getTime(),
+      )
+    })
+
+    test('Should return an undefined if express exchange not found', async () => {
+      const sut = makeSut()
+
+      const expressExchangeReturned = await sut.deleteById(
+        faker.string.uuid(),
         faker.string.uuid(),
       )
 
