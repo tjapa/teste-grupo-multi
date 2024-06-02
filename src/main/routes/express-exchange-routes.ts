@@ -76,8 +76,8 @@ export const expressExchangeRoutes = new Elysia({
     },
     {
       body: t.Object({
-        productId: t.String(),
-        customerAddressId: t.String(),
+        productId: t.Optional(t.String()),
+        customerAddressId: t.Optional(t.String()),
       }),
       params: t.Object({
         customerId: t.String(),

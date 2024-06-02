@@ -16,8 +16,8 @@ import { ExpressExchangeCantBeEditedError } from '@/domain/errors/express-exchan
 
 export type HttpRequestT = {
   body: {
-    productId: string
-    customerAddressId: string
+    productId?: string
+    customerAddressId?: string
   }
   params: {
     expressExchangeId: string
