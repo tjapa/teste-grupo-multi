@@ -39,10 +39,12 @@
     "@elysiajs/swagger": "^1.0.5",
     "@sinclair/typebox": "^0.32.31",
     "axios": "^1.7.2",
+    "bullmq": "^5.7.14",
     "dotenv": "^16.4.5",
     "drizzle-kit": "^0.21.4",
     "drizzle-orm": "^0.30.10",
     "elysia": "^1.0.22",
+    "ioredis": "^5.4.1",
     "module-alias": "^2.2.3",
     "postgres": "^3.4.4"
   },

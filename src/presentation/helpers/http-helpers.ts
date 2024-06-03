@@ -10,11 +10,6 @@ export const created = (data: any): HttpResponse => ({
   body: data,
 })
 
-export const forbidden = (error: Error): HttpResponse => ({
-  statusCode: 403,
-  body: error.message,
-})
-
 export const serverError = (): HttpResponse => ({
   statusCode: 500,
   body: 'Internal Server Error',

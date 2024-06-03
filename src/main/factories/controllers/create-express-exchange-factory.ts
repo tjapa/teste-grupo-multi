@@ -1,4 +1,5 @@
 import { CreateExpressExchange } from '@/domain/use-cases/express-exchange/create-express-exchange-use-case'
+import { NotificationQueue } from '@/infra/bullmq/notification-queue'
 import { CustomerRepository } from '@/infra/db/drizzle/customer-repository'
 import { ExpressExchangeRepository } from '@/infra/db/drizzle/express-exchange-repository'
 import { InvoiceRepository } from '@/infra/db/drizzle/invoice-repository'
@@ -14,6 +15,7 @@ export const makeCreateExpressExchangeController = () => {
   const expressExchangeRepository = new ExpressExchangeRepository()
   const invoiceIntegration = new InvoiceIntegration()
   const productIntegration = new ProductIntegration()
+  const notificationQueue = new NotificationQueue()
 
   const createExpressExchange = new CreateExpressExchange(
     invoiceRepository,
@@ -23,6 +25,7 @@ export const makeCreateExpressExchangeController = () => {
     expressExchangeRepository,
     expressExchangeRepository,
     invoiceIntegration,
+    notificationQueue,
   )
   return new CreateExpressExchangeController(createExpressExchange)
 }

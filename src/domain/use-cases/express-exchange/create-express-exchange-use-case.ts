@@ -14,6 +14,7 @@ import {
 } from '@/repository/express-exchange/create-express-exchange-repository'
 import { GetExpressExchangeByInvoiceIdRepository } from '@/repository/express-exchange/get-express-exchange-by-invoice-id-repository'
 import { GetInvoiceByIdWithProductIdsRepository } from '@/repository/invoice/get-invoice-by-id-with-product-ids-repository'
+import { EnqueueCreateExpressExchangeNotificationRepository as EnqueueCreateExpressExchangeNotificationRepository } from '@/repository/notification/enqueue-create-express-exchange-notification'
 import { GetProductByIdRepository } from '@/repository/product/get-product-by-id-repository'
 
 export type CreateExpressExchangeParams = {
@@ -38,6 +39,7 @@ export class CreateExpressExchange implements CreateExpressExchangeUseCase {
     private readonly getExpressExchangeByInvoiceIdRepository: GetExpressExchangeByInvoiceIdRepository,
     private readonly createExpressExchangeRepository: CreateExpressExchangeRepository,
     private readonly checkInvoiceWarranty: CheckInvoiceWarrantyIntegration,
+    private readonly enqueueNotificationRepository: EnqueueCreateExpressExchangeNotificationRepository,
   ) { }
 
   async create(
@@ -117,6 +119,15 @@ export class CreateExpressExchange implements CreateExpressExchangeUseCase {
     }
     const expressExchangeCreated =
       await this.createExpressExchangeRepository.create(newExpressExchangeData)
+
+    try {
+      await this.enqueueNotificationRepository.enqueueCreateExpressExchangeNotification(
+        expressExchangeCreated.id,
+        customerId,
+      )
+    } catch (error) {
+      console.error(error)
+    }
 
     return expressExchangeCreated
   }
