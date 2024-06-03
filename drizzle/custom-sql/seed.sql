@@ -23,10 +23,10 @@ ON CONFLICT ("sku") DO NOTHING;
 
 -- Inserir dados na tabela "invoices"
 INSERT INTO "invoices" ("id", "number", "serie", "customer_id", "purchase_date") VALUES
-(gen_random_uuid(), '001', 'A', (SELECT id FROM "customers" WHERE email = 'customer1@example.com'), '2023-01-01'),
-(gen_random_uuid(), '002', 'B', (SELECT id FROM "customers" WHERE email = 'customer2@example.com'), '2023-02-01'),
-(gen_random_uuid(), '003', 'C', (SELECT id FROM "customers" WHERE email = 'customer3@example.com'), '2023-03-01'),
-(gen_random_uuid(), '004', 'D', (SELECT id FROM "customers" WHERE email = 'customer1@example.com'), '2023-04-01');
+(gen_random_uuid(), '001', '001', (SELECT id FROM "customers" WHERE email = 'customer1@example.com'), '2023-01-01'),
+(gen_random_uuid(), '002', '002', (SELECT id FROM "customers" WHERE email = 'customer2@example.com'), '2023-02-01'),
+(gen_random_uuid(), '003', '003', (SELECT id FROM "customers" WHERE email = 'customer3@example.com'), '2023-03-01'),
+(gen_random_uuid(), '004', '004', (SELECT id FROM "customers" WHERE email = 'customer1@example.com'), '2023-04-01');
 
 -- Inserir dados na tabela "invoice_products"
 INSERT INTO "invoice_products" ("invoice_id", "product_id") VALUES
