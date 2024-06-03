@@ -22,6 +22,8 @@ import { env } from '@/main/config/env'
 import { mockExpressExchange } from '@/tests/domain/mocks/mock-express-exchange'
 import { faker } from '@faker-js/faker'
 import { eq } from 'drizzle-orm'
+import { redisClient } from '@/infra/db/ioredis/connection'
+import { notifExpressExchangeQueue } from '@/infra/bullmq/notification-queue'
 
 app.listen(env.port, () => {
   console.log(`Server running at http://localhost:${env.port}`)
@@ -29,8 +31,9 @@ app.listen(env.port, () => {
 
 const apiClient = edenTreaty<typeof app>('http://localhost:3000')
 
-describe('Receiver Routes', () => {
+describe('Express Exchange Routes', () => {
   afterAll(async () => {
+    await redisClient.quit()
     await disconnect()
     await app.stop()
   })
@@ -62,9 +65,10 @@ describe('Receiver Routes', () => {
         { invoiceId: invoice.id, productId: product1.id },
         { invoiceId: invoice.id, productId: product2.id },
       ])
+      await notifExpressExchangeQueue.drain()
     })
 
-    test('Should return 201 and an express exchange on success and if express exchange already exists for invoice should return 422', async () => {
+    test('Should return 201 and an express exchange on success and if express exchange already exists for invoice should return 422 and add create exchange notification to queue ', async () => {
       const response = await apiClient.api.customers[customer.id][
         'express-exchanges'
       ].post({
@@ -87,6 +91,9 @@ describe('Receiver Routes', () => {
         productId: product1.id,
       })
       expect(response2.status).toEqual(422)
+
+      const counts = await notifExpressExchangeQueue.getJobCounts('wait')
+      expect(counts.wait).toBe(1)
     })
 
     test('Should return 422 on invalid request data', async () => {

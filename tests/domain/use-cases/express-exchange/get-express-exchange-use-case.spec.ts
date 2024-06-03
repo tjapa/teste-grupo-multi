@@ -36,14 +36,14 @@ const makeSut = (): SutType => {
 }
 
 describe('Get Express Exchange Use Case', () => {
-  test('Should return the getd express exchange on success', async () => {
+  test('Should return the get express exchange on success', async () => {
     const { sut, expressExchange } = makeSut()
 
-    const expressExchangeGetd = await sut.get(
+    const expressExchangeReturned = await sut.get(
       expressExchange.id,
       expressExchange.customerId,
     )
-    expect(expressExchangeGetd).toMatchObject(expressExchange)
+    expect(expressExchangeReturned).toMatchObject(expressExchange)
   })
 
   test('Should call getExpressExchangeByIdRepository with correct params', async () => {

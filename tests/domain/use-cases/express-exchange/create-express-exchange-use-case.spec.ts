@@ -42,6 +42,9 @@ import { Product } from '@/domain/models/product'
 import { ProductOutOfStockError } from '@/domain/errors/product-out-of-stock-error'
 import { ExpressExchangeForInvoiceAlreadyExistsError } from '@/domain/errors/express-exchange-for-invoice-already-exists-error'
 import { ExpressExchangeProductUnavailableError } from '@/domain/errors/express-exchange-product-unavailable'
+import { EnqueueCreateExpressExchangeNotificationRepositoryStub } from '@/tests/repository/mocks/mock-enqueue-create-express-exchange-notification-repository'
+import { EnqueueCreateExpressExchangeNotificationRepository } from '@/repository/notification/enqueue-create-express-exchange-notification'
+import { ExpressExchange } from '@/domain/models/express-exchange'
 
 type SutType = {
   sut: CreateExpressExchangeUseCase
@@ -49,6 +52,7 @@ type SutType = {
   invoiceWithProductIds: InvoiceWithProductIds
   createExpressExchangeParams: CreateExpressExchangeParams
   product: Product
+  expressExchange: ExpressExchange
   getInvoiceByIdWithProductIdsRepository: GetInvoiceByIdWithProductIdsRepository
   getProductByIdRepository: GetProductByIdRepository
   getCustomerAddressByIdRepository: GetCustomerAddressByIdRepository
@@ -56,6 +60,7 @@ type SutType = {
   getExpressExchangeByInvoiceIdRepository: GetExpressExchangeByInvoiceIdRepository
   createExpressExchangeRepository: CreateExpressExchangeRepository
   checkInvoiceWarranty: CheckInvoiceWarrantyIntegration
+  enqueueCreateExpressExchangeNotificationRepository: EnqueueCreateExpressExchangeNotificationRepository
 }
 
 const makeSut = (): SutType => {
@@ -70,6 +75,8 @@ const makeSut = (): SutType => {
   const createExpressExchangeRepository =
     new CreateExpressExchangeRepositoryStub()
   const checkInvoiceWarranty = new CheckInvoiceWarrantyIntegrationStub()
+  const enqueueCreateExpressExchangeNotificationRepository =
+    new EnqueueCreateExpressExchangeNotificationRepositoryStub()
   const sut = new CreateExpressExchange(
     getInvoiceByIdWithProductIdsRepository,
     getProductByIdRepository,
@@ -78,6 +85,7 @@ const makeSut = (): SutType => {
     getExpressExchangeByInvoiceIdRepository,
     createExpressExchangeRepository,
     checkInvoiceWarranty,
+    enqueueCreateExpressExchangeNotificationRepository,
   )
 
   // creation of sut with setup for success flow
@@ -117,6 +125,7 @@ const makeSut = (): SutType => {
     createExpressExchangeParams,
     customerAddress,
     product,
+    expressExchange,
     invoiceWithProductIds,
     getInvoiceByIdWithProductIdsRepository,
     getProductByIdRepository,
@@ -125,6 +134,7 @@ const makeSut = (): SutType => {
     getExpressExchangeByInvoiceIdRepository,
     createExpressExchangeRepository,
     checkInvoiceWarranty,
+    enqueueCreateExpressExchangeNotificationRepository,
   }
 }
 
@@ -343,5 +353,42 @@ describe('Create Express Exchange Use Case', () => {
     const promise = sut.create(createExpressExchangeParams)
 
     expect(promise).rejects.toThrow(ItemNotFoundError)
+  })
+
+  test('Should call enqueueCreateExpressExchangeNotificationRepository with correct params', async () => {
+    const {
+      sut,
+      createExpressExchangeParams,
+      enqueueCreateExpressExchangeNotificationRepository,
+      expressExchange,
+    } = makeSut()
+    const enqueueCreateExpressExchangeNotificationSpy = jest.spyOn(
+      enqueueCreateExpressExchangeNotificationRepository,
+      'enqueueCreateExpressExchangeNotification',
+    )
+    await sut.create(createExpressExchangeParams)
+
+    expect(enqueueCreateExpressExchangeNotificationSpy).toHaveBeenCalledWith(
+      expressExchange.id,
+      createExpressExchangeParams.customerId,
+    )
+  })
+
+  test('Should ignore if enqueueCreateExpressExchangeNotificationRepository throws', async () => {
+    const {
+      sut,
+      createExpressExchangeParams,
+      enqueueCreateExpressExchangeNotificationRepository,
+    } = makeSut()
+    jest
+      .spyOn(
+        enqueueCreateExpressExchangeNotificationRepository,
+        'enqueueCreateExpressExchangeNotification',
+      )
+      .mockRejectedValueOnce(new Error())
+
+    const promise = sut.create(createExpressExchangeParams)
+
+    expect(promise).resolves.toBeTruthy()
   })
 })

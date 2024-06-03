@@ -52,10 +52,41 @@ describe('Customer Repository', () => {
     test('Should return an undefined if customer address not found', async () => {
       const sut = makeSut()
 
-      const customerReturned = await sut.getCustomerAddressById(
+      const customerAddressReturned = await sut.getCustomerAddressById(
         faker.string.uuid(),
         faker.string.uuid(),
       )
+
+      expect(customerAddressReturned).toBeUndefined()
+    })
+
+    test('Should return an undefined if is called with invalid uuid', async () => {
+      const sut = makeSut()
+
+      const customerAddressReturned = await sut.getCustomerAddressById(
+        'any_invalid_id',
+        'any_invalid_id',
+      )
+
+      expect(customerAddressReturned).toBeUndefined()
+    })
+  })
+
+  describe('getCustomerById()', () => {
+    test('Should return a customer on success', async () => {
+      const sut = makeSut()
+
+      const customer = mockCustomer()
+      await drizzleClient.insert(customers).values(customer)
+
+      const customerReturned = await sut.getCustomerById(customer.id)
+      expect(customerReturned).toEqual(customer)
+    })
+
+    test('Should return an undefined if customer address not found', async () => {
+      const sut = makeSut()
+
+      const customerReturned = await sut.getCustomerById(faker.string.uuid())
 
       expect(customerReturned).toBeUndefined()
     })
@@ -63,10 +94,7 @@ describe('Customer Repository', () => {
     test('Should return an undefined if is called with invalid uuid', async () => {
       const sut = makeSut()
 
-      const customerReturned = await sut.getCustomerAddressById(
-        'any_invalid_id',
-        'any_invalid_id',
-      )
+      const customerReturned = await sut.getCustomerById('any_invalid_id')
 
       expect(customerReturned).toBeUndefined()
     })
