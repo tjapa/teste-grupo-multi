@@ -92,7 +92,7 @@ Uma troca expressa só pode ser removida se estiver com o status "processing".
 
 ## Endpoints
 
-A documentação no Swagger pode ser acessada em: (http://localhost:3000/swagger)[http://localhost:3000/swagger]
+A documentação no Swagger pode ser acessada em: http://localhost:3000/swagger
 
 ### Exemplos
 
